@@ -3,36 +3,50 @@ package main
 import (
 	"bufio"
 	"log"
+	"math/rand"
 	"os"
 	"strings"
 )
 
 func Toting(o *Object) bool {
+	// whether or not the user currently holds the object
 	return false
 }
 
 func Here(o *Object) bool {
+	// true if toting or if room.hasitem
 	return false
 }
 
 func At(o *Object) bool {
+	// true if on either side of two placed objecct?
 	return false
 }
 
-func Liq(o *Object) bool {
+func Liq() bool {
+	// object number of liquid in bottle?
+	// should be water/21  oil/22 or nothing
 	return false
 }
 
-func Dark(r *Room) bool {
+func Dark() bool {
+	// true if room is dark
+	// why is this not a property of room
+	/* light rooms =
+	0   1   2   3   4   5   6   7   8   9   10
+	0   100 115 116 126
+	*/
+
 	return false
 }
 
 func Pct(n int) bool {
-	return false
+	return rand.Intn(100) > n-1
 }
 
 func Yea() bool {
-	return false
+	// 50/50 true/false response
+	return rand.Int()%2 == 0
 }
 
 func GetRoom(id int) *Room {
@@ -48,6 +62,15 @@ func Move(r *Room, a *Action) *Room {
 
 func GetMessage(id int) string {
 	return Msgs[id]
+}
+
+func ProcessInput(c string) string {
+	i := strings.Split(c, " ")
+	if len(i) == 1 {
+		a := GetActionFromStr(c)
+		return a.AcceptableStr[0]
+	}
+	return ""
 }
 
 func GetActionFromStr(c string) *Action {
@@ -71,13 +94,13 @@ func GetActionFromStr(c string) *Action {
 func Adventure() {
 	scanner := bufio.NewScanner(os.Stdin)
 	cur_room := Rooms[1]
-	log.Println(cur_room.ShortDesc)
+	log.Println(GetMessage(65))
 	for scanner.Scan() {
 		t := scanner.Text()
 		a := GetActionFromStr(strings.ToUpper(t))
 		if a != nil {
 			cur_room := Move(cur_room, a)
-			log.Println(cur_room.ShortDesc)
+			log.Println(cur_room.LongDesc)
 		}
 	}
 	if err := scanner.Err(); err != nil {

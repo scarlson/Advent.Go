@@ -5,6 +5,24 @@ type Action struct {
 	AcceptableStr []string
 }
 
+type Hint struct {
+	Id       int
+	Duration int
+	Value    int
+	Question int
+	Hint     int
+}
+
+type Object struct {
+	Id          int
+	Keywords    []string
+	Name        string
+	Description map[int]string
+	Location    int
+	AltLocation int
+	Immovable   bool
+}
+
 type Room struct {
 	Id         int
 	ShortDesc  string
@@ -13,8 +31,10 @@ type Room struct {
 }
 
 var Actions = make(map[int]*Action)
-var Rooms = make(map[int]*Room)
+var Hints = make(map[int]*Hint)
 var Msgs = make(map[int]string)
+var Objects = make(map[int]*Object)
+var Rooms = make(map[int]*Room)
 
 func LoadAdventure() {
 	LoadRooms()
@@ -403,7 +423,7 @@ func LoadActions() {
 	Actions[77].AcceptableStr = []string{`FORK`}
 	Actions[77].Id = 77
 
-    // interactive actions, "take rod"
+	// interactive actions, "take rod"
 	Actions[2001] = &Action{}
 	Actions[2001].AcceptableStr = []string{`CARRY`, `TAKE`, `KEEP`, `CATCH`, `STEAL`, `CAPTU`, `GET`, `TOTE`}
 	Actions[2001].Id = 2001
@@ -1291,18 +1311,6 @@ func LoadTravel() {
 	Rooms[140].Connection[11] = 112
 }
 
-type Object struct {
-	Id          int
-	Keywords    []string
-	Name        string
-	Description map[int]string
-	Location    int
-	AltLocation int
-	Immovable   bool
-}
-
-var Objects = make(map[int]*Object)
-
 func LoadObjects() {
 	for i := 1001; i <= 1070; i++ {
 		Objects[i] = &Object{}
@@ -1570,7 +1578,7 @@ func LoadObjects() {
 }
 
 func LoadMessages() {
-    // various response messages
+	// various response messages
 	Msgs[1] = `SOMEWHERE NEARBY IS COLOSSAL CAVE, WHERE OTHERS HAVE FOUND FORTUNES IN TREASURE AND GOLD, THOUGH IT IS RUMORED THAT SOME WHO ENTER ARE NEVER SEEN AGAIN. MAGIC IS SAID TO WORK IN THE CAVE. I WILL BE YOUR EYES AND HANDS. DIRECT ME WITH COMMANDS OF 1 OR 2 WORDS. I SHOULD WARN YOU THAT I LOOK AT ONLY THE FIRST FIVE LETTERS OF EACH WORD, SO YOU'LL HAVE TO ENTER "NORTHEAST" AS "NE" TO DISTINGUISH IT FROM "NORTH". (SHOULD YOU GET STUCK, TYPE "HELP" FOR SOME GENERAL HINTS. FOR INFORMATION ON HOW TO END YOUR ADVENTURE, ETC., TYPE "INFO".)`
 	Msgs[2] = `A LITTLE DWARF WITH A BIG KNIFE BLOCKS YOUR WAY.`
 	Msgs[3] = `A LITTLE DWARF JUST WALKED AROUND A CORNER, SAW YOU, THREW A LITTLE AXE AT YOU WHICH MISSED, CURSED, AND RAN AWAY.`
@@ -1773,8 +1781,8 @@ func LoadMessages() {
 }
 
 func LoadObjectLoc() {
-    // section 7 - Object Locations
-    // -1 = immovable objects, 2nd number = alternate location?
+	// section 7 - Object Locations
+	// -1 = immovable objects, 2nd number = alternate location?
 	Objects[1001].Location = 3
 	Objects[1002].Location = 3
 	Objects[1003].Location = 8
@@ -1942,18 +1950,20 @@ func GetScore(s int) string {
 	return ""
 }
 
-/*
 // section 11 == hints.
-var Hints = make(map[int][]int)
-2 9999 10 0 0
-3 9999 5 0 0
-4 4 2 62 63
-5 5 2 18 19
-6 8 2 20 21
-7 75 4 176 177
-8 25 5 178 179
-9 20 3 180 181
 
+func LoadHints() {
+	Hints[2] = &Hint{Id: 2, Duration: 9999, Value: 10, Question: 0, Hint: 0}
+	Hints[3] = &Hint{Id: 3, Duration: 9999, Value: 5, Question: 0, Hint: 0}
+	Hints[4] = &Hint{Id: 4, Duration: 4, Value: 2, Question: 62, Hint: 63}
+	Hints[5] = &Hint{Id: 5, Duration: 5, Value: 2, Question: 18, Hint: 19}
+	Hints[6] = &Hint{Id: 6, Duration: 8, Value: 2, Question: 20, Hint: 21}
+	Hints[7] = &Hint{Id: 7, Duration: 75, Value: 4, Question: 176, Hint: 177}
+	Hints[8] = &Hint{Id: 8, Duration: 25, Value: 5, Question: 178, Hint: 179}
+	Hints[9] = &Hint{Id: 9, Duration: 20, Value: 3, Question: 180, Hint: 181}
+}
+
+/*
 // probably never ever use this
 // section 12 = magic messages, identical to section 6
 var MagicMsg = make(map[int]string)
