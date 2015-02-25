@@ -6,6 +6,10 @@ type Action struct {
 	Message       int
 }
 
+func (a *Action) GetMessage() string {
+	return Msgs[a.Message]
+}
+
 type Hint struct {
 	Id       int
 	Duration int
@@ -39,6 +43,7 @@ type Room struct {
 	ShortDesc  string
 	LongDesc   string
 	Connection map[int]int // map[action]room
+	Objects    []*Object
 	Dark       bool
 	Water      bool
 	Oil        bool
@@ -1885,41 +1890,46 @@ func LoadObjectLoc() {
 	Objects[1063].Location = 127
 	Objects[1064].Location = 130
 	Objects[1064].Immovable = true
+	for _, o := range Objects {
+		if o.Location != 0 {
+			Rooms[o.Location].Objects = append(Rooms[o.Location].Objects, o)
+		}
+	}
 }
 
 // section 8 -- action messages, action[i] = msgs[j]
 func LoadActionMessages() {
-	Actions[1].Message = 24
-	Actions[2].Message = 29
-	Actions[3].Message = 0
-	Actions[4].Message = 33
-	Actions[5].Message = 0
-	Actions[6].Message = 33
-	Actions[7].Message = 38
-	Actions[8].Message = 38
-	Actions[9].Message = 42
-	Actions[10].Message = 14
-	Actions[11].Message = 43
-	Actions[12].Message = 110
-	Actions[13].Message = 29
-	Actions[14].Message = 110
-	Actions[15].Message = 73
-	Actions[16].Message = 75
-	Actions[17].Message = 29
-	Actions[18].Message = 13
-	Actions[19].Message = 59
-	Actions[20].Message = 59
-	Actions[21].Message = 174
-	Actions[22].Message = 109
-	Actions[23].Message = 67
-	Actions[24].Message = 13
-	Actions[25].Message = 147
-	Actions[26].Message = 155
-	Actions[27].Message = 195
-	Actions[28].Message = 146
-	Actions[29].Message = 110
-	Actions[30].Message = 13
-	Actions[31].Message = 13
+	Actions[2001].Message = 24 // get
+	Actions[2002].Message = 29 // drop
+	Actions[2003].Message = 0
+	Actions[2004].Message = 33 // lock/unlock
+	Actions[2005].Message = 0
+	Actions[2006].Message = 33
+	Actions[2007].Message = 38
+	Actions[2008].Message = 38
+	Actions[2009].Message = 42
+	Actions[2010].Message = 14
+	Actions[2011].Message = 43
+	Actions[2012].Message = 110
+	Actions[2013].Message = 29
+	Actions[2014].Message = 110
+	Actions[2015].Message = 73
+	Actions[2016].Message = 75
+	Actions[2017].Message = 29
+	Actions[2018].Message = 13
+	Actions[2019].Message = 59
+	Actions[2020].Message = 59
+	Actions[2021].Message = 174
+	Actions[2022].Message = 109
+	Actions[2023].Message = 67
+	Actions[2024].Message = 13
+	Actions[2025].Message = 147
+	Actions[2026].Message = 155
+	Actions[2027].Message = 195
+	Actions[2028].Message = 146
+	Actions[2029].Message = 110
+	Actions[2030].Message = 13
+	Actions[2031].Message = 13
 }
 
 // section 9 = liquid assets?

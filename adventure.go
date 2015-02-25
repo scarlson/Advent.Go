@@ -8,6 +8,10 @@ import (
 	"strings"
 )
 
+var (
+	lastmessage int
+)
+
 func Toting(o *Object) bool {
 	// whether or not the user currently holds the object
 	return false
@@ -99,8 +103,14 @@ func Adventure() {
 		t := scanner.Text()
 		a := GetActionFromStr(strings.ToUpper(t))
 		if a != nil {
+			if a.GetMessage() != "" {
+				log.Println(a.GetMessage())
+			}
 			cur_room := Move(cur_room, a)
 			log.Println(cur_room.LongDesc)
+			for _, o := range cur_room.Objects {
+				log.Println(o.Description[000])
+			}
 		}
 	}
 	if err := scanner.Err(); err != nil {
