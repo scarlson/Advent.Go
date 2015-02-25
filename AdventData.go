@@ -3,6 +3,7 @@ package main
 type Action struct {
 	Id            int
 	AcceptableStr []string
+	Message       int
 }
 
 type Hint struct {
@@ -11,6 +12,16 @@ type Hint struct {
 	Value    int
 	Question int
 	Hint     int
+}
+
+func (h *Hint) GetQuestion() string {
+	// returns the string value for the hint's question
+	return Msgs[h.Question]
+}
+
+func (h *Hint) GetHint() string {
+	// returns the string value for the hint's answer
+	return Msgs[h.Hint]
 }
 
 type Object struct {
@@ -28,6 +39,16 @@ type Room struct {
 	ShortDesc  string
 	LongDesc   string
 	Connection map[int]int // map[action]room
+	Dark       bool
+	Water      bool
+	Oil        bool
+	PirateBan  bool
+	Cave       bool
+	Bird       bool
+	Snake      bool
+	Maze       bool
+	Pondering  bool
+	Witts      bool
 }
 
 var Actions = make(map[int]*Action)
@@ -51,6 +72,7 @@ func LoadRooms() {
 	for i := 1; i <= 140; i++ {
 		Rooms[i] = &Room{}
 		Rooms[i].Connection = make(map[int]int)
+		Rooms[i].Dark = true
 	}
 }
 
@@ -79,7 +101,7 @@ func LoadLongDesc() {
 	Rooms[21].LongDesc = `YOU DIDN'T MAKE IT.`
 	Rooms[22].LongDesc = `THE DOME IS UNCLIMBABLE.`
 	Rooms[23].LongDesc = `YOU ARE AT THE WEST END OF THE TWOPIT ROOM. THERE IS A LARGE HOLE IN THE WALL ABOVE THE PIT AT THIS END OF THE ROOM.`
-	Rooms[24].LongDesc = `YOU ARE AT THE BOTTOM OF THE EASTERN PIT IN THE TWOPIT ROOM. THERE IS A SMALL POOL OF OIL IN ONE CORNER OF THE PIT.`
+	Rooms[24].LongDesc = `YOU ARE AT THE BOTTOM OF THE EASTERN PIT IN THE TWOPIT ROOM. THERE IS A SMALL POOL OF OIL IN ONE CORNER OF THE PIT.` // oil source
 	Rooms[25].LongDesc = `YOU ARE AT THE BOTTOM OF THE WESTERN PIT IN THE TWOPIT ROOM. THERE IS A LARGE HOLE IN THE WALL ABOUT 25 FEET ABOVE YOU.`
 	Rooms[26].LongDesc = `YOU CLAMBER UP THE PLANT AND SCURRY THROUGH THE HOLE AT THE TOP.`
 	Rooms[27].LongDesc = `YOU ARE ON THE WEST SIDE OF THE FISSURE IN THE HALL OF MISTS.`
@@ -1865,58 +1887,129 @@ func LoadObjectLoc() {
 	Objects[1064].Immovable = true
 }
 
-/*
-
-// section 8 -- action defaults, "proper" definition for each action
-1 24
-2 29
-3 0
-4 33
-5 0
-6 33
-7 38
-8 38
-9 42
-10 14
-11 43
-12 110
-13 29
-14 110
-15 73
-16 75
-17 29
-18 13
-19 59
-20 59
-21 174
-22 109
-23 67
-24 13
-25 147
-26 155
-27 195
-28 146
-29 110
-30 13
-31 13
-
+// section 8 -- action messages, action[i] = msgs[j]
+func LoadActionMessages() {
+	Actions[1].Message = 24
+	Actions[2].Message = 29
+	Actions[3].Message = 0
+	Actions[4].Message = 33
+	Actions[5].Message = 0
+	Actions[6].Message = 33
+	Actions[7].Message = 38
+	Actions[8].Message = 38
+	Actions[9].Message = 42
+	Actions[10].Message = 14
+	Actions[11].Message = 43
+	Actions[12].Message = 110
+	Actions[13].Message = 29
+	Actions[14].Message = 110
+	Actions[15].Message = 73
+	Actions[16].Message = 75
+	Actions[17].Message = 29
+	Actions[18].Message = 13
+	Actions[19].Message = 59
+	Actions[20].Message = 59
+	Actions[21].Message = 174
+	Actions[22].Message = 109
+	Actions[23].Message = 67
+	Actions[24].Message = 13
+	Actions[25].Message = 147
+	Actions[26].Message = 155
+	Actions[27].Message = 195
+	Actions[28].Message = 146
+	Actions[29].Message = 110
+	Actions[30].Message = 13
+	Actions[31].Message = 13
+}
 
 // section 9 = liquid assets?
-0 1 2 3 4 5 6 7 8 9 10
-0 100 115 116 126
-2 1 3 4 7 38 95 113 24
-1 24
-3 46 47 48 54 56 58 82 85 86
-3 122 123 124 125 126 127 128 129 130
-4 8
-5 13
-6 19
-7 42 43 44 45 46 47 48 49 50 51
-7 52 53 54 55 56 80 81 82 86 87
-8 99 100 101
-9 108
+func LoadStateful() {
+	// "light" rooms
+	Rooms[1].Dark = false
+	Rooms[2].Dark = false
+	Rooms[3].Dark = false
+	Rooms[4].Dark = false
+	Rooms[5].Dark = false
+	Rooms[6].Dark = false
+	Rooms[7].Dark = false
+	Rooms[8].Dark = false
+	Rooms[9].Dark = false
+	Rooms[10].Dark = false
+	Rooms[100].Dark = false
+	Rooms[115].Dark = false
+	Rooms[116].Dark = false
+	Rooms[126].Dark = false
 
-*/
+	// rooms with water?
+	Rooms[2].Water = true
+	Rooms[1].Water = true
+	Rooms[3].Water = true
+	Rooms[4].Water = true
+	Rooms[7].Water = true
+	Rooms[38].Water = true
+	Rooms[95].Water = true
+	Rooms[113].Water = true
+	Rooms[24].Water = true
+
+	// rooms with oil?
+	Rooms[24].Oil = true // on = oil, off = water
+
+	// rooms the pirate can't enter unless he's following the player
+	Rooms[46].PirateBan = true
+	Rooms[47].PirateBan = true
+	Rooms[48].PirateBan = true
+	Rooms[54].PirateBan = true
+	Rooms[56].PirateBan = true
+	Rooms[58].PirateBan = true
+	Rooms[82].PirateBan = true
+	Rooms[85].PirateBan = true
+	Rooms[86].PirateBan = true
+	Rooms[122].PirateBan = true
+	Rooms[123].PirateBan = true
+	Rooms[124].PirateBan = true
+	Rooms[125].PirateBan = true
+	Rooms[126].PirateBan = true
+	Rooms[127].PirateBan = true
+	Rooms[128].PirateBan = true
+	Rooms[129].PirateBan = true
+	Rooms[130].PirateBan = true
+
+	// rest of these are bits for checking hints
+	// 'trying to get into the cave'
+	Rooms[8].Cave = true
+	Rooms[13].Bird = true
+	Rooms[19].Snake = true
+
+	// Lost in a maze
+	Rooms[42].Maze = true
+	Rooms[43].Maze = true
+	Rooms[44].Maze = true
+	Rooms[45].Maze = true
+	Rooms[46].Maze = true
+	Rooms[47].Maze = true
+	Rooms[48].Maze = true
+	Rooms[49].Maze = true
+	Rooms[50].Maze = true
+	Rooms[51].Maze = true
+	Rooms[52].Maze = true
+	Rooms[53].Maze = true
+	Rooms[54].Maze = true
+	Rooms[55].Maze = true
+	Rooms[56].Maze = true
+	Rooms[80].Maze = true
+	Rooms[81].Maze = true
+	Rooms[82].Maze = true
+	Rooms[86].Maze = true
+	Rooms[87].Maze = true
+
+	// pondering dark room?
+	Rooms[99].Pondering = true
+	Rooms[100].Pondering = true
+	Rooms[101].Pondering = true
+
+	// witts end
+	Rooms[108].Witts = true
+}
 
 // section 10 = class messages = player rank
 func GetScore(s int) string {
