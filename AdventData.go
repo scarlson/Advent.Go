@@ -1,45 +1,51 @@
 package main
 
+// Action is user input mapped to movement IDs that let the user interact with the game
 type Action struct {
-	Id            int
+	ID            int
 	AcceptableStr []string
 	Message       int
 }
 
+// GetMessage returns the string response for a given action
 func (a *Action) GetMessage() string {
 	return Msgs[a.Message]
 }
 
+// Hint is message to help a player when they're stuck
 type Hint struct {
-	Id       int
+	ID       int
 	Duration int
 	Value    int
 	Question int
 	Hint     int
 }
 
-func (h *Hint) GetQuestion() string {
+func (h *Hint) getQuestion() string {
 	// returns the string value for the hint's question
 	return Msgs[h.Question]
 }
 
-func (h *Hint) GetHint() string {
+func (h *Hint) getHint() string {
 	// returns the string value for the hint's answer
 	return Msgs[h.Hint]
 }
 
+// Object are interactable objects the user will manipulate
 type Object struct {
-	Id          int
+	ID          int
 	Keywords    []string
 	Name        string
 	Description map[int]string
 	Location    int
 	AltLocation int
 	Immovable   bool
+	Prop        int
 }
 
+// Room is the individual environment cells the user acts in
 type Room struct {
-	Id         int
+	ID         int
 	ShortDesc  string
 	LongDesc   string
 	Connection map[int]int // map[action]room
@@ -56,24 +62,35 @@ type Room struct {
 	Witts      bool
 }
 
+// Actions is a convenience map for storing possible user actions
 var Actions = make(map[int]*Action)
+
+// Hints is a convenience map for storing possible user hitns
 var Hints = make(map[int]*Hint)
+
+// Msgs is a convenience map for storing all output text
 var Msgs = make(map[int]string)
+
+// Objects is a convenience map for storing all the interactable objects
 var Objects = make(map[int]*Object)
+
+// Rooms is a convenience map for storing the individual cells of the map
 var Rooms = make(map[int]*Room)
 
+// LoadAdventure loads all the necessary data from the tables into the convenience maps
 func LoadAdventure() {
-	LoadRooms()
-	LoadActions()
-	LoadMessages()
-	LoadObjects()
-	LoadShortDesc()
-	LoadLongDesc()
-	LoadTravel()
-	LoadObjectLoc()
+	// Load all the table data
+	loadRooms()
+	loadActions()
+	loadMessages()
+	loadObjects()
+	loadShortDesc()
+	loadLongDesc()
+	loadTravel()
+	loadObjectLoc()
 }
 
-func LoadRooms() {
+func loadRooms() {
 	for i := 1; i <= 140; i++ {
 		Rooms[i] = &Room{}
 		Rooms[i].Connection = make(map[int]int)
@@ -81,7 +98,7 @@ func LoadRooms() {
 	}
 }
 
-func LoadLongDesc() {
+func loadLongDesc() {
 	// verbose room descriptions
 	Rooms[1].LongDesc = `YOU ARE STANDING AT THE END OF A ROAD BEFORE A SMALL BRICK BUILDING. AROUND YOU IS A FOREST. A SMALL STREAM FLOWS OUT OF THE BUILDING AND DOWN A GULLY.`
 	Rooms[2].LongDesc = `YOU HAVE WALKED UP A HILL, STILL IN THE FOREST. THE ROAD SLOPES BACK DOWN THE OTHER SIDE OF THE HILL. THERE IS A BUILDING IN THE DISTANCE.`
@@ -225,7 +242,7 @@ func LoadLongDesc() {
 	Rooms[140].LongDesc = `DEAD END`
 }
 
-func LoadShortDesc() {
+func loadShortDesc() {
 	// short room descriptions, saves on char space
 	Rooms[1].ShortDesc = `YOU'RE AT END OF ROAD AGAIN.`
 	Rooms[2].ShortDesc = `YOU'RE AT HILL IN ROAD.`
@@ -294,306 +311,306 @@ func LoadShortDesc() {
 	Rooms[130].ShortDesc = `YOU'RE IN BARREN ROOM.`
 }
 
-func LoadActions() {
+func loadActions() {
 	for i := 2; i <= 77; i++ {
 		Actions[i] = &Action{}
 	}
 	// movement actions
 	Actions[2].AcceptableStr = []string{`ROAD`, `HILL`}
-	Actions[2].Id = 2
+	Actions[2].ID = 2
 	Actions[3].AcceptableStr = []string{`ENTER`}
-	Actions[3].Id = 3
+	Actions[3].ID = 3
 	Actions[4].AcceptableStr = []string{`UPSTR`}
-	Actions[4].Id = 4
+	Actions[4].ID = 4
 	Actions[5].AcceptableStr = []string{`DOWNS`}
-	Actions[5].Id = 5
+	Actions[5].ID = 5
 	Actions[6].AcceptableStr = []string{`FORES`}
-	Actions[6].Id = 6
+	Actions[6].ID = 6
 	Actions[7].AcceptableStr = []string{`FORWA`, `CONTI`, `ONWAR`}
-	Actions[7].Id = 7
+	Actions[7].ID = 7
 	Actions[8].AcceptableStr = []string{`BACK`, `RETUR`, `RETRE`}
-	Actions[8].Id = 8
+	Actions[8].ID = 8
 	Actions[9].AcceptableStr = []string{`VALLE`}
-	Actions[9].Id = 9
+	Actions[9].ID = 9
 	Actions[10].AcceptableStr = []string{`STAIR`}
-	Actions[10].Id = 10
+	Actions[10].ID = 10
 	Actions[11].AcceptableStr = []string{`OUT`, `OUTSI`, `EXIT`, `LEAVE`}
-	Actions[11].Id = 11
+	Actions[11].ID = 11
 	Actions[12].AcceptableStr = []string{`BUILD`, `HOUSE`}
-	Actions[12].Id = 12
+	Actions[12].ID = 12
 	Actions[13].AcceptableStr = []string{`GULLY`}
-	Actions[13].Id = 13
+	Actions[13].ID = 13
 	Actions[14].AcceptableStr = []string{`STREA`}
-	Actions[14].Id = 14
+	Actions[14].ID = 14
 	Actions[15].AcceptableStr = []string{`ROCK`}
-	Actions[15].Id = 15
+	Actions[15].ID = 15
 	Actions[16].AcceptableStr = []string{`BED`}
-	Actions[16].Id = 16
+	Actions[16].ID = 16
 	Actions[17].AcceptableStr = []string{`CRAWL`}
-	Actions[17].Id = 17
+	Actions[17].ID = 17
 	Actions[18].AcceptableStr = []string{`COBBL`}
-	Actions[18].Id = 18
+	Actions[18].ID = 18
 	Actions[19].AcceptableStr = []string{`INWAR`, `INSID`, `IN`}
-	Actions[19].Id = 19
+	Actions[19].ID = 19
 	Actions[20].AcceptableStr = []string{`SURFA`}
-	Actions[20].Id = 20
+	Actions[20].ID = 20
 	Actions[21].AcceptableStr = []string{`NULL`, `NOWHE`}
-	Actions[21].Id = 21
+	Actions[21].ID = 21
 	Actions[22].AcceptableStr = []string{`DARK`}
-	Actions[22].Id = 22
+	Actions[22].ID = 22
 	Actions[23].AcceptableStr = []string{`PASSA`, `TUNNE`}
-	Actions[23].Id = 23
+	Actions[23].ID = 23
 	Actions[24].AcceptableStr = []string{`LOW`}
-	Actions[24].Id = 24
+	Actions[24].ID = 24
 	Actions[25].AcceptableStr = []string{`CANYO`}
-	Actions[25].Id = 25
+	Actions[25].ID = 25
 	Actions[26].AcceptableStr = []string{`AWKWA`}
-	Actions[26].Id = 26
+	Actions[26].ID = 26
 	Actions[27].AcceptableStr = []string{`GIANT`}
-	Actions[27].Id = 27
+	Actions[27].ID = 27
 	Actions[28].AcceptableStr = []string{`VIEW`}
-	Actions[28].Id = 28
+	Actions[28].ID = 28
 	Actions[29].AcceptableStr = []string{`UPWAR`, `UP`, `U`, `ABOVE`, `ASCEN`}
-	Actions[29].Id = 29
+	Actions[29].ID = 29
 	Actions[30].AcceptableStr = []string{`D`, `DOWNW`, `DOWN`, `DESCE`}
-	Actions[30].Id = 30
+	Actions[30].ID = 30
 	Actions[31].AcceptableStr = []string{`PIT`}
-	Actions[31].Id = 31
+	Actions[31].ID = 31
 	Actions[32].AcceptableStr = []string{`OUTDO`}
-	Actions[32].Id = 32
+	Actions[32].ID = 32
 	Actions[33].AcceptableStr = []string{`CRACK`}
-	Actions[33].Id = 33
+	Actions[33].ID = 33
 	Actions[34].AcceptableStr = []string{`STEPS`}
-	Actions[34].Id = 34
+	Actions[34].ID = 34
 	Actions[35].AcceptableStr = []string{`DOME`}
-	Actions[35].Id = 35
+	Actions[35].ID = 35
 	Actions[36].AcceptableStr = []string{`LEFT`}
-	Actions[36].Id = 36
+	Actions[36].ID = 36
 	Actions[37].AcceptableStr = []string{`RIGHT`}
-	Actions[37].Id = 37
+	Actions[37].ID = 37
 	Actions[38].AcceptableStr = []string{`HALL`}
-	Actions[38].Id = 38
+	Actions[38].ID = 38
 	Actions[39].AcceptableStr = []string{`JUMP`}
-	Actions[39].Id = 39
+	Actions[39].ID = 39
 	Actions[40].AcceptableStr = []string{`BARRE`}
-	Actions[40].Id = 40
+	Actions[40].ID = 40
 	Actions[41].AcceptableStr = []string{`OVER`}
-	Actions[41].Id = 41
+	Actions[41].ID = 41
 	Actions[42].AcceptableStr = []string{`ACROS`}
-	Actions[42].Id = 42
+	Actions[42].ID = 42
 	Actions[43].AcceptableStr = []string{`EAST`, `E`}
-	Actions[43].Id = 43
+	Actions[43].ID = 43
 	Actions[44].AcceptableStr = []string{`WEST`, `W`}
-	Actions[44].Id = 44
+	Actions[44].ID = 44
 	Actions[45].AcceptableStr = []string{`NORTH`, `N`}
-	Actions[45].Id = 45
+	Actions[45].ID = 45
 	Actions[46].AcceptableStr = []string{`SOUTH`, `S`}
-	Actions[46].Id = 46
+	Actions[46].ID = 46
 	Actions[47].AcceptableStr = []string{`NE`}
-	Actions[47].Id = 47
+	Actions[47].ID = 47
 	Actions[48].AcceptableStr = []string{`SE`}
-	Actions[48].Id = 48
+	Actions[48].ID = 48
 	Actions[49].AcceptableStr = []string{`SW`}
-	Actions[49].Id = 49
+	Actions[49].ID = 49
 	Actions[50].AcceptableStr = []string{`NW`}
-	Actions[50].Id = 50
+	Actions[50].ID = 50
 	Actions[51].AcceptableStr = []string{`DEBRI`}
-	Actions[51].Id = 51
+	Actions[51].ID = 51
 	Actions[52].AcceptableStr = []string{`HOLE`}
-	Actions[52].Id = 52
+	Actions[52].ID = 52
 	Actions[53].AcceptableStr = []string{`WALL`}
-	Actions[53].Id = 53
+	Actions[53].ID = 53
 	Actions[54].AcceptableStr = []string{`BROKE`}
-	Actions[54].Id = 54
+	Actions[54].ID = 54
 	Actions[55].AcceptableStr = []string{`Y2`}
-	Actions[55].Id = 55
+	Actions[55].ID = 55
 	Actions[56].AcceptableStr = []string{`CLIMB`}
-	Actions[56].Id = 56
+	Actions[56].ID = 56
 	Actions[57].AcceptableStr = []string{`LOOK`, `EXAMI`, `TOUCH`, `DESCR`}
-	Actions[57].Id = 57
+	Actions[57].ID = 57
 	Actions[58].AcceptableStr = []string{`FLOOR`}
-	Actions[58].Id = 58
+	Actions[58].ID = 58
 	Actions[59].AcceptableStr = []string{`ROOM`}
-	Actions[59].Id = 59
+	Actions[59].ID = 59
 	Actions[60].AcceptableStr = []string{`SLIT`}
-	Actions[60].Id = 60
+	Actions[60].ID = 60
 	Actions[61].AcceptableStr = []string{`SLAB`, `SLABR`}
-	Actions[61].Id = 61
+	Actions[61].ID = 61
 	Actions[62].AcceptableStr = []string{`XYZZY`}
-	Actions[62].Id = 62
+	Actions[62].ID = 62
 	Actions[63].AcceptableStr = []string{`DEPRE`}
-	Actions[63].Id = 63
+	Actions[63].ID = 63
 	Actions[64].AcceptableStr = []string{`ENTRA`}
-	Actions[64].Id = 64
+	Actions[64].ID = 64
 	Actions[65].AcceptableStr = []string{`PLUGH`}
-	Actions[65].Id = 65
+	Actions[65].ID = 65
 	Actions[66].AcceptableStr = []string{`SECRE`}
-	Actions[66].Id = 66
+	Actions[66].ID = 66
 	Actions[67].AcceptableStr = []string{`CAVE`}
-	Actions[67].Id = 67
+	Actions[67].ID = 67
 	Actions[69].AcceptableStr = []string{`CROSS`}
-	Actions[69].Id = 69
+	Actions[69].ID = 69
 	Actions[70].AcceptableStr = []string{`BEDQU`}
-	Actions[70].Id = 70
+	Actions[70].ID = 70
 	Actions[71].AcceptableStr = []string{`PLOVE`}
-	Actions[71].Id = 71
+	Actions[71].ID = 71
 	Actions[72].AcceptableStr = []string{`ORIEN`}
-	Actions[72].Id = 72
+	Actions[72].ID = 72
 	Actions[73].AcceptableStr = []string{`CAVER`}
-	Actions[73].Id = 73
+	Actions[73].ID = 73
 	Actions[74].AcceptableStr = []string{`SHELL`}
-	Actions[74].Id = 74
+	Actions[74].ID = 74
 	Actions[75].AcceptableStr = []string{`RESER`}
-	Actions[75].Id = 75
+	Actions[75].ID = 75
 	Actions[76].AcceptableStr = []string{`MAIN`, `OFFIC`}
-	Actions[76].Id = 76
+	Actions[76].ID = 76
 	Actions[77].AcceptableStr = []string{`FORK`}
-	Actions[77].Id = 77
+	Actions[77].ID = 77
 
 	// interactive actions, "take rod"
 	Actions[2001] = &Action{}
 	Actions[2001].AcceptableStr = []string{`CARRY`, `TAKE`, `KEEP`, `CATCH`, `STEAL`, `CAPTU`, `GET`, `TOTE`}
-	Actions[2001].Id = 2001
+	Actions[2001].ID = 2001
 	Actions[2002] = &Action{}
 	Actions[2002].AcceptableStr = []string{`DROP`, `RELEA`, `FREE`, `DISCA`, `DUMP`}
-	Actions[2002].Id = 2002
+	Actions[2002].ID = 2002
 	Actions[2003] = &Action{}
 	Actions[2003].AcceptableStr = []string{`SAY`, `CHANT`, `SING`, `UTTER`, `MUMBL`}
-	Actions[2003].Id = 2003
+	Actions[2003].ID = 2003
 	Actions[2004] = &Action{}
 	Actions[2004].AcceptableStr = []string{`UNLOC`, `OPEN`}
-	Actions[2004].Id = 2004
+	Actions[2004].ID = 2004
 	Actions[2005] = &Action{}
 	Actions[2005].AcceptableStr = []string{`NOTHI`}
-	Actions[2005].Id = 2005
+	Actions[2005].ID = 2005
 	Actions[2006] = &Action{}
 	Actions[2006].AcceptableStr = []string{`LOCK`, `CLOSE`}
-	Actions[2006].Id = 2006
+	Actions[2006].ID = 2006
 	Actions[2007] = &Action{}
 	Actions[2007].AcceptableStr = []string{`LIGHT`, `ON`}
-	Actions[2007].Id = 2007
+	Actions[2007].ID = 2007
 	Actions[2008] = &Action{}
 	Actions[2008].AcceptableStr = []string{`EXTIN`, `OFF`}
-	Actions[2008].Id = 2008
+	Actions[2008].ID = 2008
 	Actions[2009] = &Action{}
 	Actions[2009].AcceptableStr = []string{`WAVE`, `SHAKE`, `SWING`}
-	Actions[2009].Id = 2009
+	Actions[2009].ID = 2009
 	Actions[2010] = &Action{}
 	Actions[2010].AcceptableStr = []string{`CALM`, `PLACA`, `TAME`}
-	Actions[2010].Id = 2010
+	Actions[2010].ID = 2010
 	Actions[2011] = &Action{}
 	Actions[2011].AcceptableStr = []string{`WALK`, `RUN`, `TRAVE`, `GO`, `PROCE`, `CONTI`, `EXPLO`, `GOTO`, `FOLLO`, `TURN`}
-	Actions[2011].Id = 2011
+	Actions[2011].ID = 2011
 	Actions[2012] = &Action{}
 	Actions[2012].AcceptableStr = []string{`ATTAC`, `KILL`, `FIGHT`, `HIT`, `STRIK`}
-	Actions[2012].Id = 2012
+	Actions[2012].ID = 2012
 	Actions[2013] = &Action{}
 	Actions[2013].AcceptableStr = []string{`POUR`}
-	Actions[2013].Id = 2013
+	Actions[2013].ID = 2013
 	Actions[2014] = &Action{}
 	Actions[2014].AcceptableStr = []string{`EAT`, `DEVOU`}
-	Actions[2014].Id = 2014
+	Actions[2014].ID = 2014
 	Actions[2015] = &Action{}
 	Actions[2015].AcceptableStr = []string{`DRINK`}
-	Actions[2015].Id = 2015
+	Actions[2015].ID = 2015
 	Actions[2016] = &Action{}
 	Actions[2016].AcceptableStr = []string{`RUB`}
-	Actions[2016].Id = 2016
+	Actions[2016].ID = 2016
 	Actions[2017] = &Action{}
 	Actions[2017].AcceptableStr = []string{`THROW`, `TOSS`}
-	Actions[2017].Id = 2017
+	Actions[2017].ID = 2017
 	Actions[2018] = &Action{}
 	Actions[2018].AcceptableStr = []string{`QUIT`}
-	Actions[2018].Id = 2018
+	Actions[2018].ID = 2018
 	Actions[2019] = &Action{}
 	Actions[2019].AcceptableStr = []string{`FIND`, `WHERE`}
-	Actions[2019].Id = 2019
+	Actions[2019].ID = 2019
 	Actions[2020] = &Action{}
 	Actions[2020].AcceptableStr = []string{`INVEN`}
-	Actions[2020].Id = 2020
+	Actions[2020].ID = 2020
 	Actions[2021] = &Action{}
 	Actions[2021].AcceptableStr = []string{`FEED`}
-	Actions[2021].Id = 2021
+	Actions[2021].ID = 2021
 	Actions[2022] = &Action{}
 	Actions[2022].AcceptableStr = []string{`FILL`}
-	Actions[2022].Id = 2022
+	Actions[2022].ID = 2022
 	Actions[2023] = &Action{}
 	Actions[2023].AcceptableStr = []string{`BLAST`, `DETON`, `IGNIT`, `BLOWU`}
-	Actions[2023].Id = 2023
+	Actions[2023].ID = 2023
 	Actions[2024] = &Action{}
 	Actions[2024].AcceptableStr = []string{`SCORE`}
-	Actions[2024].Id = 2024
+	Actions[2024].ID = 2024
 	Actions[2025] = &Action{}
 	Actions[2025].AcceptableStr = []string{`FEE`, `FIE`, `FOE`, `FOO`, `FUM`}
-	Actions[2025].Id = 2025
+	Actions[2025].ID = 2025
 	Actions[2026] = &Action{}
 	Actions[2026].AcceptableStr = []string{`BRIEF`}
-	Actions[2026].Id = 2026
+	Actions[2026].ID = 2026
 	Actions[2027] = &Action{}
 	Actions[2027].AcceptableStr = []string{`READ`, `PERUS`}
-	Actions[2027].Id = 2027
+	Actions[2027].ID = 2027
 	Actions[2028] = &Action{}
 	Actions[2028].AcceptableStr = []string{`BREAK`, `SHATT`, `SMASH`}
-	Actions[2028].Id = 2028
+	Actions[2028].ID = 2028
 	Actions[2029] = &Action{}
 	Actions[2029].AcceptableStr = []string{`WAKE`, `DISTU`}
-	Actions[2029].Id = 2029
+	Actions[2029].ID = 2029
 	Actions[2030] = &Action{}
 	Actions[2030].AcceptableStr = []string{`SUSPE`, `PAUSE`, `SAVE`}
-	Actions[2030].Id = 2030
+	Actions[2030].ID = 2030
 	Actions[2031] = &Action{}
 	Actions[2031].AcceptableStr = []string{`HOURS`}
-	Actions[2031].Id = 2031
+	Actions[2031].ID = 2031
 
 	// special case verbs
 	Actions[3001] = &Action{}
 	Actions[3001].AcceptableStr = []string{`FEE`}
-	Actions[3001].Id = 3001
+	Actions[3001].ID = 3001
 	Actions[3002] = &Action{}
 	Actions[3002].AcceptableStr = []string{`FIE`}
-	Actions[3002].Id = 3002
+	Actions[3002].ID = 3002
 	Actions[3003] = &Action{}
 	Actions[3003].AcceptableStr = []string{`FOE`}
-	Actions[3003].Id = 3003
+	Actions[3003].ID = 3003
 	Actions[3004] = &Action{}
 	Actions[3004].AcceptableStr = []string{`FOO`}
-	Actions[3004].Id = 3004
+	Actions[3004].ID = 3004
 	Actions[3005] = &Action{}
 	Actions[3005].AcceptableStr = []string{`FUM`}
-	Actions[3005].Id = 3005
+	Actions[3005].ID = 3005
 	Actions[3050] = &Action{}
 	Actions[3050].AcceptableStr = []string{`SESAM`, `OPENS`, `ABRA`, `ABRAC`, `SHAZA`, `HOCUS`, `POCUS`}
-	Actions[3050].Id = 3050
+	Actions[3050].ID = 3050
 	Actions[3051] = &Action{}
 	Actions[3051].AcceptableStr = []string{`HELP`, `?`}
-	Actions[3051].Id = 3051
+	Actions[3051].ID = 3051
 	Actions[3064] = &Action{}
 	Actions[3064].AcceptableStr = []string{`TREE`, `TREES`}
-	Actions[3064].Id = 3064
+	Actions[3064].ID = 3064
 	Actions[3066] = &Action{}
 	Actions[3066].AcceptableStr = []string{`DIG`, `EXCAV`}
-	Actions[3066].Id = 3066
+	Actions[3066].ID = 3066
 	Actions[3068] = &Action{}
 	Actions[3068].AcceptableStr = []string{`LOST`}
-	Actions[3068].Id = 3068
+	Actions[3068].ID = 3068
 	Actions[3069] = &Action{}
 	Actions[3069].AcceptableStr = []string{`MIST`}
-	Actions[3069].Id = 3069
+	Actions[3069].ID = 3069
 	Actions[3079] = &Action{}
 	Actions[3079].AcceptableStr = []string{`FUCK`}
-	Actions[3079].Id = 3079
+	Actions[3079].ID = 3079
 	Actions[3139] = &Action{}
 	Actions[3139].AcceptableStr = []string{`STOP`}
-	Actions[3139].Id = 3139
+	Actions[3139].ID = 3139
 	Actions[3142] = &Action{}
 	Actions[3142].AcceptableStr = []string{`INFO`, `INFOR`}
-	Actions[3142].Id = 3142
+	Actions[3142].ID = 3142
 	Actions[3147] = &Action{}
 	Actions[3147].AcceptableStr = []string{`SWIM`}
-	Actions[3147].Id = 3147
+	Actions[3147].ID = 3147
 }
 
-func LoadTravel() {
+func loadTravel() {
 	// Rooms[origin].Connection[action] = destination
 	Rooms[1].Connection[2] = 2
 	Rooms[1].Connection[44] = 2
@@ -1338,100 +1355,100 @@ func LoadTravel() {
 	Rooms[140].Connection[11] = 112
 }
 
-func LoadObjects() {
+func loadObjects() {
 	for i := 1001; i <= 1070; i++ {
 		Objects[i] = &Object{}
 		Objects[i].Description = make(map[int]string)
 	}
 	Objects[1001].Keywords = []string{`KEYS`, `KEY`}
-	Objects[1001].Id = 1001
+	Objects[1001].ID = 1001
 	Objects[1001].Name = "SET OF KEYS"
 	Objects[1001].Description[000] = `THERE ARE SOME KEYS ON THE GROUND HERE.`
 	Objects[1002].Keywords = []string{`LAMP`, `HEADL`, `LANTE`}
-	Objects[1002].Id = 1002
+	Objects[1002].ID = 1002
 	Objects[1002].Name = "BRASS LANTERN"
 	Objects[1002].Description[000] = `THERE IS A SHINY BRASS LAMP NEARBY.`
 	Objects[1002].Description[100] = `THERE IS A LAMP SHINING NEARBY.`
 	Objects[1003].Keywords = []string{`GRATE`}
-	Objects[1003].Id = 1003
+	Objects[1003].ID = 1003
 	Objects[1003].Name = "*GRATE"
 	Objects[1003].Description[000] = `THE GRATE IS LOCKED.`
 	Objects[1003].Description[100] = `THE GRATE IS OPEN.`
 	Objects[1004].Keywords = []string{`CAGE`}
-	Objects[1004].Id = 1004
+	Objects[1004].ID = 1004
 	Objects[1004].Name = "WICKER CAGE"
 	Objects[1004].Description[000] = `THERE IS A SMALL WICKER CAGE DISCARDED NEARBY.`
 	Objects[1005].Keywords = []string{`ROD`}
-	Objects[1005].Id = 1005
+	Objects[1005].ID = 1005
 	Objects[1005].Name = "BLACK ROD"
 	Objects[1005].Description[000] = `A THREE FOOT BLACK ROD WITH A RUSTY STAR ON AN END LIES NEARBY.`
 	Objects[1006].Keywords = []string{`ROD`} // (MUST BE NEXT OBJECT AFTER "REAL" ROD)`
-	Objects[1006].Id = 1006
+	Objects[1006].ID = 1006
 	Objects[1006].Name = "BLACK ROD"
 	Objects[1006].Description[000] = `A THREE FOOT BLACK ROD WITH A RUSTY MARK ON AN END LIES NEARBY.`
 	Objects[1007].Keywords = []string{`STEPS`}
-	Objects[1007].Id = 1007
+	Objects[1007].ID = 1007
 	Objects[1007].Name = "*STEPS"
 	Objects[1007].Description[000] = `ROUGH STONE STEPS LEAD DOWN THE PIT.`
 	Objects[1007].Description[100] = `ROUGH STONE STEPS LEAD UP THE DOME.`
 	Objects[1008].Keywords = []string{`BIRD`}
-	Objects[1008].Id = 1008
+	Objects[1008].ID = 1008
 	Objects[1008].Name = "LITTLE BIRD IN CAGE"
 	Objects[1008].Description[000] = `A CHEERFUL LITTLE BIRD IS SITTING HERE SINGING.`
 	Objects[1008].Description[100] = `THERE IS A LITTLE BIRD IN THE CAGE.`
 	Objects[1009].Keywords = []string{`DOOR`}
-	Objects[1009].Id = 1009
+	Objects[1009].ID = 1009
 	Objects[1009].Name = "*RUSTY DOOR"
 	Objects[1009].Description[000] = `THE WAY NORTH IS BARRED BY A MASSIVE, RUSTY, IRON DOOR.`
 	Objects[1009].Description[100] = `THE WAY NORTH LEADS THROUGH A MASSIVE, RUSTY, IRON DOOR.`
 	Objects[1010].Keywords = []string{`PILLO`, `VELVE`}
-	Objects[1010].Id = 1010
+	Objects[1010].ID = 1010
 	Objects[1010].Name = "VELVET PILLOW"
 	Objects[1010].Description[000] = `A SMALL VELVET PILLOW LIES ON THE FLOOR.`
 	Objects[1011].Keywords = []string{`SNAKE`}
-	Objects[1011].Id = 1011
+	Objects[1011].ID = 1011
 	Objects[1011].Name = "*SNAKE"
 	Objects[1011].Description[000] = `A HUGE GREEN FIERCE SNAKE BARS THE WAY!`
 	Objects[1011].Description[100] = `>$. (CHASED AWAY)`
 	Objects[1012].Keywords = []string{`FISSU`}
-	Objects[1012].Id = 1012
+	Objects[1012].ID = 1012
 	Objects[1012].Name = "*FISSURE"
 	Objects[1012].Description[000] = `>$<`
 	Objects[1012].Description[100] = `A CRYSTAL BRIDGE NOW SPANS THE FISSURE.`
 	Objects[1012].Description[200] = `THE CRYSTAL BRIDGE HAS VANISHED!`
 	Objects[1013].Keywords = []string{`TABLE`}
-	Objects[1013].Id = 1013
+	Objects[1013].ID = 1013
 	Objects[1013].Name = "*STONE TABLET"
 	Objects[1013].Description[000] = `A MASSIVE STONE TABLET IMBEDDED IN THE WALL READS, "CONGRATULATIONS ON BRINGING LIGHT INTO THE DARK-ROOM!"`
 	Objects[1014].Keywords = []string{`CLAM`}
-	Objects[1014].Id = 1014
+	Objects[1014].ID = 1014
 	Objects[1014].Name = "GIANT CLA. >GRUNT!<"
 	Objects[1014].Description[000] = `THERE IS AN ENORMOUS CLAM HERE WITH ITS SHELL TIGHTLY CLOSED.`
 	Objects[1015].Keywords = []string{`OYSTE`}
-	Objects[1015].Id = 1015
+	Objects[1015].ID = 1015
 	Objects[1015].Name = "GIANT OYSTE. >GROAN!<"
 	Objects[1015].Description[000] = `THERE IS AN ENORMOUS OYSTER HERE WITH ITS SHELL TIGHTLY CLOSED.`
 	Objects[1015].Description[100] = `INTERESTING. THERE SEEMS TO BE SOMETHING WRITTEN ON THE UNDERSIDE OF THE OYSTER.`
 	Objects[1016].Keywords = []string{`MAGAZ`, `ISSUE`, `SPELU`, `"SPEL`}
-	Objects[1016].Id = 1016
+	Objects[1016].ID = 1016
 	Objects[1016].Name = `"SPELUNKER TODAY"`
 	Objects[1016].Description[000] = `THERE ARE A FEW RECENT ISSUES OF "SPELUNKER TODAY" MAGAZINE HERE.`
 	Objects[1019].Keywords = []string{`FOOD`, `RATIO`}
-	Objects[1019].Id = 1019
+	Objects[1019].ID = 1019
 	Objects[1019].Name = "TASTY FOOD"
 	Objects[1019].Description[000] = `THERE IS FOOD HERE.`
 	Objects[1020].Keywords = []string{`BOTTL`, `JAR`}
-	Objects[1020].Id = 1020
+	Objects[1020].ID = 1020
 	Objects[1020].Name = "SMALL BOTTLE"
 	Objects[1020].Description[000] = `THERE IS A BOTTLE OF WATER HERE.`
 	Objects[1020].Description[100] = `THERE IS AN EMPTY BOTTLE HERE.`
 	Objects[1020].Description[200] = `THERE IS A BOTTLE OF OIL HERE.`
 	Objects[1023].Keywords = []string{`MIRRO`}
-	Objects[1023].Id = 1023
+	Objects[1023].ID = 1023
 	Objects[1023].Name = "*MIRROR"
 	Objects[1023].Description[000] = `>$<`
 	Objects[1024].Keywords = []string{`PLANT`, `BEANS`}
-	Objects[1024].Id = 1024
+	Objects[1024].ID = 1024
 	Objects[1024].Name = "*PLANT"
 	Objects[1024].Description[000] = `THERE IS A TINY LITTLE PLANT IN THE PIT, MURMURING "WATER, WATER..."`
 	Objects[1024].Description[100] = `THE PLANT SPURTS INTO FURIOUS GROWTH FOR A FEW SECONDS.`
@@ -1440,145 +1457,145 @@ func LoadObjects() {
 	Objects[1024].Description[400] = `THERE IS A GIGANTIC BEANSTALK STRETCHING ALL THE WAY UP TO THE HOLE.`
 	Objects[1024].Description[500] = `YOU'VE OVER-WATERED THE PLANT! IT'S SHRIVELING UP. IT'S, IT'S...`
 	Objects[1025].Keywords = []string{`PLANT`} //(MUST BE NEXT OBJECT AFTER "REAL" PLANT)`
-	Objects[1025].Id = 1025
+	Objects[1025].ID = 1025
 	Objects[1025].Name = "*PHONY PLANT (SEEN IN TWOPIT ROOM ONLY WHEN TALL ENOUGH)"
 	Objects[1025].Description[000] = `>$<`
 	Objects[1025].Description[100] = `THE TOP OF A 12-FOOT-TALL BEANSTALK IS POKING OUT OF THE WEST PIT.`
 	Objects[1025].Description[200] = `THERE IS A HUGE BEANSTALK GROWING OUT OF THE WEST PIT UP TO THE HOLE.`
 	Objects[1026].Keywords = []string{`STALA`}
-	Objects[1026].Id = 1026
+	Objects[1026].ID = 1026
 	Objects[1026].Name = "*STALACTITE"
 	Objects[1026].Description[000] = `>$<`
 	Objects[1027].Keywords = []string{`SHADO`, `FIGUR`}
-	Objects[1027].Id = 1027
+	Objects[1027].ID = 1027
 	Objects[1027].Name = "*SHADOWY FIGURE"
 	Objects[1027].Description[000] = `THE SHADOWY FIGURE SEEMS TO BE TRYING TO ATTRACT YOUR ATTENTION.`
 	Objects[1028].Keywords = []string{`AXE`}
-	Objects[1028].Id = 1028
+	Objects[1028].ID = 1028
 	Objects[1028].Name = "DWARF'S AXE"
 	Objects[1028].Description[000] = `THERE IS A LITTLE AXE HERE.`
 	Objects[1028].Description[100] = `THERE IS A LITTLE AXE LYING BESIDE THE BEAR.`
 	Objects[1029].Keywords = []string{`DRAWI`}
-	Objects[1029].Id = 1029
+	Objects[1029].ID = 1029
 	Objects[1029].Name = "*CAVE DRAWINGS"
 	Objects[1029].Description[000] = `>$<`
 	Objects[1030].Keywords = []string{`PIRAT`}
-	Objects[1030].Id = 1030
+	Objects[1030].ID = 1030
 	Objects[1030].Name = "*PIRATE"
 	Objects[1030].Description[000] = `>$<`
 	Objects[1031].Keywords = []string{`DRAGO`}
-	Objects[1031].Id = 1031
+	Objects[1031].ID = 1031
 	Objects[1031].Name = "*DRAGON"
 	Objects[1031].Description[000] = `A HUGE GREEN FIERCE DRAGON BARS THE WAY!`
 	Objects[1031].Description[100] = `CONGRATULATIONS. YOU HAVE JUST VANQUISHED A DRAGON WITH YOUR BARE HANDS! (UNBELIEVABLE, ISN'T IT?)`
 	Objects[1031].Description[200] = `THE BODY OF A HUGE GREEN DEAD DRAGON IS LYING OFF TO ONE SIDE.`
 	Objects[1032].Keywords = []string{`CHASM`}
-	Objects[1032].Id = 1032
+	Objects[1032].ID = 1032
 	Objects[1032].Name = "*CHASM"
 	Objects[1032].Description[000] = `A RICKETY WOODEN BRIDGE EXTENDS ACROSS THE CHASM, VANISHING INTO THE MIST. A SIGN POSTED ON THE BRIDGE READS, "STOP! PAY TROLL!"`
 	Objects[1032].Description[100] = `THE WRECKAGE OF A BRIDGE (AND A DEAD BEAR) CAN BE SEEN AT THE BOTTOM OF THE CHASM.`
 	Objects[1033].Keywords = []string{`TROLL`}
-	Objects[1033].Id = 1033
+	Objects[1033].ID = 1033
 	Objects[1033].Name = "*TROLL"
 	Objects[1033].Description[000] = `A BURLY TROLL STANDS BY THE BRIDGE AND INSISTS YOU THROW HIM A TREASURE BEFORE YOU MAY CROSS.`
 	Objects[1033].Description[100] = `THE TROLL STEPS OUT FROM BENEATH THE BRIDGE AND BLOCKS YOUR WAY.`
 	Objects[1033].Description[200] = `>$. (CHASED AWAY)`
 	Objects[1034].Keywords = []string{`TROLL`} // (MUST BE NEXT OBJECT AFTER "REAL" TROLL)`
-	Objects[1034].Id = 1034
+	Objects[1034].ID = 1034
 	Objects[1034].Name = "*PHONY TROLL"
 	Objects[1034].Description[000] = `THE TROLL IS NOWHERE TO BE SEEN.`
 	Objects[1035].Keywords = []string{`BEAR`}
-	Objects[1035].Id = 1035
+	Objects[1035].ID = 1035
 	Objects[1035].Name = ">$. (BEAR USES RTEXT 141)"
 	Objects[1035].Description[000] = `THERE IS A FEROCIOUS CAVE BEAR EYING YOU FROM THE FAR END OF THE ROOM!`
 	Objects[1035].Description[100] = `THERE IS A GENTLE CAVE BEAR SITTING PLACIDLY IN ONE CORNER.`
 	Objects[1035].Description[200] = `THERE IS A CONTENTED-LOOKING BEAR WANDERING ABOUT NEARBY.`
 	Objects[1035].Description[300] = `>$. (DEAD)`
 	Objects[1036].Keywords = []string{`MESSA`}
-	Objects[1036].Id = 1036
+	Objects[1036].ID = 1036
 	Objects[1036].Name = "*MESSAGE IN SECOND MAZE"
 	Objects[1036].Description[000] = `THERE IS A MESSAGE SCRAWLED IN THE DUST IN A FLOWERY SCRIPT, READING: "THIS IS NOT THE MAZE WHERE THE PIRATE LEAVES HIS TREASURE CHEST."`
 	Objects[1037].Keywords = []string{`VOLCA`, `GEYSE`} // (SAME AS VOLCANO)`
-	Objects[1037].Id = 1037
+	Objects[1037].ID = 1037
 	Objects[1037].Name = "*VOLCANO AND/OR GEYSER"
 	Objects[1037].Description[000] = `>$<`
 	Objects[1038].Keywords = []string{`MACHI`, `VENDI`}
-	Objects[1038].Id = 1038
+	Objects[1038].ID = 1038
 	Objects[1038].Name = "*VENDING MACHINE"
 	Objects[1038].Description[000] = `THERE IS A MASSIVE VENDING MACHINE HERE. THE INSTRUCTIONS ON IT READ: "DROP COINS HERE TO RECEIVE FRESH BATTERIES."`
 	Objects[1039].Keywords = []string{`BATTE`}
-	Objects[1039].Id = 1039
+	Objects[1039].ID = 1039
 	Objects[1039].Name = "BATTERIES"
 	Objects[1039].Description[000] = `THERE ARE FRESH BATTERIES HERE.`
 	Objects[1039].Description[100] = `SOME WORN-OUT BATTERIES HAVE BEEN DISCARDED NEARBY.`
 	Objects[1040].Keywords = []string{`CARPE`, `MOSS`}
-	Objects[1040].Id = 1040
+	Objects[1040].ID = 1040
 	Objects[1040].Name = "*CARPET AND/OR MOSS"
 	Objects[1040].Description[000] = `>$<`
 	Objects[1050].Keywords = []string{`GOLD`, `NUGGE`}
-	Objects[1050].Id = 1050
+	Objects[1050].ID = 1050
 	Objects[1050].Name = "LARGE GOLD NUGGET"
 	Objects[1050].Description[000] = `THERE IS A LARGE SPARKLING NUGGET OF GOLD HERE!`
 	Objects[1051].Keywords = []string{`DIAMO`}
-	Objects[1051].Id = 1051
+	Objects[1051].ID = 1051
 	Objects[1051].Name = "SEVERAL DIAMONDS"
 	Objects[1051].Description[000] = `THERE ARE DIAMONDS HERE!`
 	Objects[1052].Keywords = []string{`SILVE`, `BARS`}
-	Objects[1052].Id = 1052
+	Objects[1052].ID = 1052
 	Objects[1052].Name = "BARS OF SILVER"
 	Objects[1052].Description[000] = `THERE ARE BARS OF SILVER HERE!`
 	Objects[1053].Keywords = []string{`JEWEL`}
-	Objects[1053].Id = 1053
+	Objects[1053].ID = 1053
 	Objects[1053].Name = "PRECIOUS JEWELRY"
 	Objects[1053].Description[000] = `THERE IS PRECIOUS JEWELRY HERE!`
 	Objects[1054].Keywords = []string{`COINS`}
-	Objects[1054].Id = 1054
+	Objects[1054].ID = 1054
 	Objects[1054].Name = "RARE COINS"
 	Objects[1054].Description[000] = `THERE ARE MANY COINS HERE!`
 	Objects[1055].Keywords = []string{`CHEST`, `BOX`, `TREAS`}
-	Objects[1055].Id = 1055
+	Objects[1055].ID = 1055
 	Objects[1055].Name = "TREASURE CHEST"
 	Objects[1055].Description[000] = `THE PIRATE'S TREASURE CHEST IS HERE!`
 	Objects[1056].Keywords = []string{`EGGS`, `EGG`, `NEST`}
-	Objects[1056].Id = 1056
+	Objects[1056].ID = 1056
 	Objects[1056].Name = "GOLDEN EGGS"
 	Objects[1056].Description[000] = `THERE IS A LARGE NEST HERE, FULL OF GOLDEN EGGS!`
 	Objects[1056].Description[100] = `THE NEST OF GOLDEN EGGS HAS VANISHED!`
 	Objects[1056].Description[200] = `DONE!`
 	Objects[1057].Keywords = []string{`TRIDE`}
-	Objects[1057].Id = 1057
+	Objects[1057].ID = 1057
 	Objects[1057].Name = "JEWELED TRIDENT"
 	Objects[1057].Description[000] = `THERE IS A JEWEL-ENCRUSTED TRIDENT HERE!`
 	Objects[1058].Keywords = []string{`VASE`, `MING`, `SHARD`, `POTTE`}
-	Objects[1058].Id = 1058
+	Objects[1058].ID = 1058
 	Objects[1058].Name = "MING VASE"
 	Objects[1058].Description[000] = `THERE IS A DELICATE, PRECIOUS, MING VASE HERE!`
 	Objects[1058].Description[100] = `THE VASE IS NOW RESTING, DELICATELY, ON A VELVET PILLOW.`
 	Objects[1058].Description[200] = `THE FLOOR IS LITTERED WITH WORTHLESS SHARDS OF POTTERY.`
 	Objects[1058].Description[300] = `THE MING VASE DROPS WITH A DELICATE CRASH.`
 	Objects[1059].Keywords = []string{`EMERA`}
-	Objects[1059].Id = 1059
+	Objects[1059].ID = 1059
 	Objects[1059].Name = "EGG-SIZED EMERALD"
 	Objects[1059].Description[000] = `THERE IS AN EMERALD HERE THE SIZE OF A PLOVER'S EGG!`
 	Objects[1060].Keywords = []string{`PLATI`, `PYRAM`}
-	Objects[1060].Id = 1060
+	Objects[1060].ID = 1060
 	Objects[1060].Name = "PLATINUM PYRAMID"
 	Objects[1060].Description[000] = `THERE IS A PLATINUM PYRAMID HERE, 8 INCHES ON A SIDE!`
 	Objects[1061].Keywords = []string{`PEARL`}
-	Objects[1061].Id = 1061
+	Objects[1061].ID = 1061
 	Objects[1061].Name = "GLISTENING PEARL"
 	Objects[1061].Description[000] = `OFF TO ONE SIDE LIES A GLISTENING PEARL!`
 	Objects[1062].Keywords = []string{`RUG`, `PERSI`}
-	Objects[1062].Id = 1062
+	Objects[1062].ID = 1062
 	Objects[1062].Name = "PERSIAN RUG"
 	Objects[1062].Description[000] = `THERE IS A PERSIAN RUG SPREAD OUT ON THE FLOOR!`
 	Objects[1062].Description[100] = `THE DRAGON IS SPRAWLED OUT ON A PERSIAN RUG!!`
 	Objects[1063].Keywords = []string{`SPICE`}
-	Objects[1063].Id = 1063
+	Objects[1063].ID = 1063
 	Objects[1063].Name = "RARE SPICES"
 	Objects[1063].Description[000] = `THERE ARE RARE SPICES HERE!`
 	Objects[1064].Keywords = []string{`CHAIN`}
-	Objects[1064].Id = 1064
+	Objects[1064].ID = 1064
 	Objects[1064].Name = "GOLDEN CHAIN"
 	Objects[1064].Description[000] = `THERE IS A GOLDEN CHAIN LYING IN A HEAP ON THE FLOOR!`
 	Objects[1064].Description[100] = `THE BEAR IS LOCKED TO THE WALL WITH A GOLDEN CHAIN!`
@@ -1586,25 +1603,25 @@ func LoadObjects() {
 
 	Objects[1017] = &Object{
 		Keywords: []string{`DWARF`, `DWARV`},
-		Id:       1017,
+		ID:       1017,
 	}
 	Objects[1018] = &Object{
 		Keywords: []string{`KNIFE`, `KNIVE`},
-		Id:       1018,
+		ID:       1018,
 	}
 	Objects[1021] = &Object{
 		Keywords: []string{`WATER`, `H2O`},
-		Id:       1021,
+		ID:       1021,
 		Name:     "WATER IN THE BOTTLE",
 	}
 	Objects[1022] = &Object{
 		Keywords: []string{`OIL`},
-		Id:       1022,
+		ID:       1022,
 		Name:     "OIL IN THE BOTTLE",
 	}
 }
 
-func LoadMessages() {
+func loadMessages() {
 	// various response messages
 	Msgs[1] = `SOMEWHERE NEARBY IS COLOSSAL CAVE, WHERE OTHERS HAVE FOUND FORTUNES IN TREASURE AND GOLD, THOUGH IT IS RUMORED THAT SOME WHO ENTER ARE NEVER SEEN AGAIN. MAGIC IS SAID TO WORK IN THE CAVE. I WILL BE YOUR EYES AND HANDS. DIRECT ME WITH COMMANDS OF 1 OR 2 WORDS. I SHOULD WARN YOU THAT I LOOK AT ONLY THE FIRST FIVE LETTERS OF EACH WORD, SO YOU'LL HAVE TO ENTER "NORTHEAST" AS "NE" TO DISTINGUISH IT FROM "NORTH". (SHOULD YOU GET STUCK, TYPE "HELP" FOR SOME GENERAL HINTS. FOR INFORMATION ON HOW TO END YOUR ADVENTURE, ETC., TYPE "INFO".)`
 	Msgs[2] = `A LITTLE DWARF WITH A BIG KNIFE BLOCKS YOUR WAY.`
@@ -1807,7 +1824,7 @@ func LoadMessages() {
 	Msgs[200] = `IS THIS ACCEPTABLE? THERE'S NO POINT IN SUSPENDING A DEMONSTRATION GAME.`
 }
 
-func LoadObjectLoc() {
+func loadObjectLoc() {
 	// section 7 - Object Locations
 	// -1 = immovable objects, 2nd number = alternate location?
 	Objects[1001].Location = 3
@@ -1898,7 +1915,7 @@ func LoadObjectLoc() {
 }
 
 // section 8 -- action messages, action[i] = msgs[j]
-func LoadActionMessages() {
+func loadActionMessages() {
 	Actions[2001].Message = 24 // get
 	Actions[2002].Message = 29 // drop
 	Actions[2003].Message = 0
@@ -1933,7 +1950,7 @@ func LoadActionMessages() {
 }
 
 // section 9 = liquid assets?
-func LoadStateful() {
+func loadStateful() {
 	// "light" rooms
 	Rooms[1].Dark = false
 	Rooms[2].Dark = false
@@ -2021,7 +2038,7 @@ func LoadStateful() {
 	Rooms[108].Witts = true
 }
 
-// section 10 = class messages = player rank
+// GetScore = section 10 = class messages = player rank
 func GetScore(s int) string {
 	if s <= 35 {
 		return `YOU ARE OBVIOUSLY A RANK AMATEUR. BETTER LUCK NEXT TIME.`
@@ -2055,15 +2072,15 @@ func GetScore(s int) string {
 
 // section 11 == hints.
 
-func LoadHints() {
-	Hints[2] = &Hint{Id: 2, Duration: 9999, Value: 10, Question: 0, Hint: 0}
-	Hints[3] = &Hint{Id: 3, Duration: 9999, Value: 5, Question: 0, Hint: 0}
-	Hints[4] = &Hint{Id: 4, Duration: 4, Value: 2, Question: 62, Hint: 63}
-	Hints[5] = &Hint{Id: 5, Duration: 5, Value: 2, Question: 18, Hint: 19}
-	Hints[6] = &Hint{Id: 6, Duration: 8, Value: 2, Question: 20, Hint: 21}
-	Hints[7] = &Hint{Id: 7, Duration: 75, Value: 4, Question: 176, Hint: 177}
-	Hints[8] = &Hint{Id: 8, Duration: 25, Value: 5, Question: 178, Hint: 179}
-	Hints[9] = &Hint{Id: 9, Duration: 20, Value: 3, Question: 180, Hint: 181}
+func loadHints() {
+	Hints[2] = &Hint{ID: 2, Duration: 9999, Value: 10, Question: 0, Hint: 0}
+	Hints[3] = &Hint{ID: 3, Duration: 9999, Value: 5, Question: 0, Hint: 0}
+	Hints[4] = &Hint{ID: 4, Duration: 4, Value: 2, Question: 62, Hint: 63}
+	Hints[5] = &Hint{ID: 5, Duration: 5, Value: 2, Question: 18, Hint: 19}
+	Hints[6] = &Hint{ID: 6, Duration: 8, Value: 2, Question: 20, Hint: 21}
+	Hints[7] = &Hint{ID: 7, Duration: 75, Value: 4, Question: 176, Hint: 177}
+	Hints[8] = &Hint{ID: 8, Duration: 25, Value: 5, Question: 178, Hint: 179}
+	Hints[9] = &Hint{ID: 9, Duration: 20, Value: 3, Question: 180, Hint: 181}
 }
 
 /*

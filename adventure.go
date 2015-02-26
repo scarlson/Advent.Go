@@ -10,64 +10,74 @@ import (
 
 var (
 	lastmessage int
+
+	dwarves   []Object
+	bottle    *Object
+	inventory []*Object
 )
 
+// ActSpeak displays the default message for the action
+func ActSpeak(a *Action) string {
+	return a.GetMessage()
+}
+
+// Toting tells us whether or not the user currently holds the object
 func Toting(o *Object) bool {
-	// whether or not the user currently holds the object
 	return false
 }
 
+// Here returns true if toting or if room.hasitem
 func Here(o *Object) bool {
-	// true if toting or if room.hasitem
 	return false
 }
 
+// At returns true if on either side of two placed objecct?
 func At(o *Object) bool {
-	// true if on either side of two placed objecct?
 	return false
 }
 
+// Liq returns the flag for what the bottle contents are
 func Liq() bool {
 	// object number of liquid in bottle?
 	// should be water/21  oil/22 or nothing
 	return false
 }
 
+// Dark returns bool of whether the room has light or not
 func Dark() bool {
-	// true if room is dark
-	// why is this not a property of room
-	/* light rooms =
-	0   1   2   3   4   5   6   7   8   9   10
-	0   100 115 116 126
-	*/
-
 	return false
 }
 
+// Pct returns true if and event happens Pct(n) of times (eg 30% change)
 func Pct(n int) bool {
 	return rand.Intn(100) > n-1
 }
 
+// Yea is 50/50 chance of yay or neigh
 func Yea() bool {
 	// 50/50 true/false response
 	return rand.Int()%2 == 0
 }
 
+// GetRoom is a convenience method to return a room from the rooms map
 func GetRoom(id int) *Room {
 	return Rooms[id]
 }
 
+// Move returns the resulting room if the input action is performed on the input room
 func Move(r *Room, a *Action) *Room {
-	if _, ok := r.Connection[a.Id]; ok {
-		return Rooms[r.Connection[a.Id]]
+	if _, ok := r.Connection[a.ID]; ok {
+		return Rooms[r.Connection[a.ID]]
 	}
 	return r
 }
 
+// GetMessage is a convenience method to return a message from the message map
 func GetMessage(id int) string {
 	return Msgs[id]
 }
 
+// ProcessInput evaluates user input and executes the game logic
 func ProcessInput(c string) string {
 	i := strings.Split(c, " ")
 	if len(i) == 1 {
@@ -77,6 +87,7 @@ func ProcessInput(c string) string {
 	return ""
 }
 
+// GetActionFromStr searches the action map for the action applied by user input string
 func GetActionFromStr(c string) *Action {
 	//Actions[45].AcceptableStr = []string{`NORTH`, `N`}
 	for _, cmd := range Actions {
@@ -95,9 +106,10 @@ func GetActionFromStr(c string) *Action {
 	return nil
 }
 
+// Adventure kickstarts the game logic
 func Adventure() {
 	scanner := bufio.NewScanner(os.Stdin)
-	cur_room := Rooms[1]
+	curRoom := Rooms[1]
 	log.Println(GetMessage(65))
 	for scanner.Scan() {
 		t := scanner.Text()
@@ -106,9 +118,9 @@ func Adventure() {
 			if a.GetMessage() != "" {
 				log.Println(a.GetMessage())
 			}
-			cur_room := Move(cur_room, a)
-			log.Println(cur_room.LongDesc)
-			for _, o := range cur_room.Objects {
+			curRoom := Move(curRoom, a)
+			log.Println(curRoom.LongDesc)
+			for _, o := range curRoom.Objects {
 				log.Println(o.Description[000])
 			}
 		}
